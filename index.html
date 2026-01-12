@@ -5,34 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MTS 极速转码器</title>
     <script src="coi-serviceworker.js"></script>
+
     <style>
-        :root { --primary-color: #007aff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f2f2f7; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        .container { width: 90%; max-width: 400px; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-        h1 { font-size: 20px; color: #1c1c1e; margin-bottom: 20px; }
-        #drop-zone { border: 2px dashed #c7c7cc; border-radius: 12px; padding: 30px 10px; margin-bottom: 20px; transition: all 0.3s; }
-        input[type="file"] { display: none; }
-        .label-btn { background: var(--primary-color); color: white; padding: 12px 24px; border-radius: 10px; cursor: pointer; display: inline-block; font-weight: 600; }
-        #status { margin-top: 20px; font-size: 14px; color: #8e8e93; line-height: 1.5; }
-        .progress-container { width: 100%; background: #e5e5ea; height: 8px; border-radius: 4px; margin-top: 15px; display: none; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--primary-color); transition: width 0.2s; }
-        video { width: 100%; border-radius: 10px; margin-top: 20px; display: none; border: 1px solid #e5e5ea; }
+        :root {
+            --primary-color: #D0DFB8;
+            --page-bg: #FFF9E9;
+            --card-bg: #E3F0D4;
+            --accent-color: #E8C7CC;
+            --text-main: #3a3a3a;
+            --text-sub: #6b6b6b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--page-bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 22px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 20px;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        #drop-zone {
+            border: 2px dashed var(--accent-color);
+            border-radius: 14px;
+            padding: 30px 10px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.4);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .label-btn {
+            background: var(--primary-color);
+            color: #3a3a3a;
+            padding: 12px 26px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 600;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .label-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255,255,255,0.6);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.2s;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: #fff;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>MTS 转 MP4</h1>
+        <h1>
+            MTS 极速转码器<br>
+            —— to 汪汪🐟
+        </h1>
+
         <div id="drop-zone">
-            <p style="color: #8e8e93;">选择相机原始 MTS 文件</p>
+            <p style="color: var(--text-sub); margin-bottom: 12px;">
+                选择相机原始 MTS 文件
+            </p>
             <label for="uploader" class="label-btn">选择文件</label>
             <input type="file" id="uploader" accept=".mts,.MTS">
         </div>
-        
+
         <div class="progress-container" id="prog-box">
             <div id="progress-bar"></div>
         </div>
-        
+
         <div id="status">准备就绪（本地转码，不消耗流量）</div>
+
         <video id="player" controls></video>
         <div id="download-link"></div>
     </div>
