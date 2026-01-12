@@ -22,6 +22,7 @@
     <script>
         const { createFFmpeg, fetchFile } = FFmpeg;
 
+        // 初始化 FFmpeg 实例
         const ffmpeg = createFFmpeg({
             log: true,
             corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
@@ -32,25 +33,27 @@
         const progressBar = document.getElementById('progress-bar');
         const progBox = document.getElementById('prog-box');
 
+        // 核心转换函数
         async function transcode(file) {
             try {
+                // 1. 加载引擎
                 if (!ffmpeg.isLoaded()) {
                     status.innerText = "⏳ 正在初始化转码引擎...";
                     await ffmpeg.load();
                 }
 
-                // 清理残余文件
+                // 2. 清理之前的残余文件，释放内存
                 try {
                     ffmpeg.FS('unlink', 'input.mts');
                     ffmpeg.FS('unlink', 'output.mp4');
                 } catch (e) {}
 
-                // 读取文件
-                status.innerText = "📂 正在读取原始文件...";
+                // 3. 读取文件到内存
+                status.innerText = "📂 正在读取 DV 原始文件...";
                 const data = await file.arrayBuffer();
                 ffmpeg.FS('writeFile', 'input.mts', new Uint8Array(data));
 
-                // 开始转码
+                // 4. 开始转码
                 progBox.style.display = 'block';
                 status.innerText = "⚙️ 正在进行兼容性转码 (请保持屏幕常亮)...";
 
@@ -64,31 +67,32 @@
                     '-c:v', 'libx264',
                     '-profile:v', 'main',
                     '-level', '4.0',
-                    '-preset', 'ultrafast',
-                    '-crf', '26',
+                    '-preset', 'ultrafast', // 使用最快预设，减少浏览器假死几率
+                    '-crf', '26',           // 质量系数
                     '-c:a', 'aac',
                     '-b:a', '128k',
                     '-movflags', 'faststart',
                     'output.mp4'
                 );
 
-                status.innerText = "🎉 转码完成！正在生成下载文件...";
-
+                // 5. 生成下载文件
+                status.innerText = "🎉 转码成功！正在生成下载文件...";
                 const outputData = ffmpeg.FS('readFile', 'output.mp4');
+
                 if (outputData.length < 1000) throw new Error("转码输出异常，文件过小");
 
                 const blob = new Blob([outputData.buffer], { type: 'video/mp4' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'converted.mp4';
+                a.download = 'converted.mp4'; // 可根据需要改文件名
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
 
                 status.innerHTML = `✅ 转换完成！视频已自动下载到您的设备。`;
 
-                // 内存清理
+                // 6. 内存清理
                 ffmpeg.FS('unlink', 'input.mts');
                 ffmpeg.FS('unlink', 'output.mp4');
 
@@ -98,6 +102,7 @@
             }
         }
 
+        // 监听上传事件
         uploader.addEventListener('change', (e) => {
             if (e.target.files[0]) {
                 transcode(e.target.files[0]);
